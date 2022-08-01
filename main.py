@@ -1,3 +1,4 @@
+import json
 import random
 import tkinter as tk
 from tkinter import messagebox
@@ -31,19 +32,30 @@ def save():
     website = website_entry.get()
     email = email_entry.get()
     password = password_entry.get()
+    new_data = {
+        website: {
+            "email": email,
+            "password": password
+        }
+    }
 
     if not (bool(website) and bool(email) and bool(password)):
         messagebox.showinfo(title="Opps", message="Pleas make sure you haven't left any fields empty.")
     else:
-        is_ok = messagebox.askokcancel(title=website,
-                                       message=f"These are the details entered: \nEmail: {email}"
-                                               f"\nPassword: {password} \nIs it ok to save?")
-        if is_ok:
-            with open("./data.txt", mode="a") as data_file:
-                data_file.write(f"{website} | {email} | {password}\n")
-                website_entry.delete(0, tk.END)
-                password_entry.delete(0, tk.END)
-                website_entry.focus()
+        try:
+            with open("./data.json", mode="r") as data_file:
+                data = json.load(data_file)
+        except (FileNotFoundError, json.decoder.JSONDecodeError):
+            with open("./data.json", mode="w") as data_file:
+                json.dump(new_data, data_file, indent=4)
+        else:
+            data.update(new_data)
+            with open("./data.json", mode="w") as data_file:
+                json.dump(data, data_file, indent=4)
+        finally:
+            website_entry.delete(0, tk.END)
+            password_entry.delete(0, tk.END)
+            website_entry.focus()
 
 
 # ---------------------------- UI SETUP ------------------------------- #
