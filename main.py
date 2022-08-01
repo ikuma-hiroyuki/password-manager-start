@@ -58,6 +58,27 @@ def save():
             website_entry.focus()
 
 
+# ---------------------------- FIND PASSWORD ------------------------------- #
+def find_password():
+    website = website_entry.get()
+
+    def not_registered_message():
+        messagebox.showwarning(title="Not Registered", message=f"Site {website} is not registered.")
+
+    try:
+        with open("./data.json", mode="r") as data_file:
+            json_data = json.load(data_file)
+    except FileNotFoundError:
+        not_registered_message()
+    else:
+        if website in json_data:
+            password = json_data[website]["password"]
+            email = json_data[website]["email"]
+            messagebox.showinfo(title="Site Information", message=f"Password: {password}\nEmail: {email}")
+        else:
+            not_registered_message()
+
+
 # ---------------------------- UI SETUP ------------------------------- #
 window = tk.Tk()
 window.title("Password Manager")
@@ -93,6 +114,9 @@ password_entry = tk.Entry(width=21)
 password_entry.grid(row=3, column=1, sticky="EW")
 
 # Buttons
+search_button = tk.Button(text="Search", command=find_password)
+search_button.grid(row=1, column=2, sticky="EW")
+
 generate_button = tk.Button(text="Generate Password", command=generate_password)
 generate_button.grid(row=3, column=2, sticky="EW")
 
